@@ -1,6 +1,6 @@
 import React from 'react';
 import PokemonCard from './PokemonCard';
-import Filter from './filter';
+import Filter from './Filter';
 
 export default function PokemonLists(props) {
   return (
