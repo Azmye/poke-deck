@@ -1,13 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Search from '../components/Search';
 import PokemonLists from '../components/PokemonLists';
 import useFetchAllPokemon from '../hooks/useFetchAllPokemon';
+import PokemonCard from '../components/PokemonCard';
+import { PokeCreateModalCtx } from '../context/pokeCreateModal';
+import { PokemonStoreCtx } from '../context/pokemonContext';
+import { MdCheck } from 'react-icons/md';
+import { PokeDeleteContext } from '../context/pokeDeleteContext';
 
 export default function Home() {
   const [searchData, setSearchData] = useState('');
   const [filterData, setFilterData] = useState('');
+  const [pokeData, setPokeData] = useState(null);
   const [filteredData, setFilteredData] = useState(null);
   const { pokemonData, loading, error } = useFetchAllPokemon();
+
+  // Context
+  const [pokeState, pokeDispatch] = useContext(PokeCreateModalCtx);
+  const [deletePokeState, deletePokeDispatch] = useContext(PokeDeleteContext);
+  const { data: decks, setData: setDecks } = useContext(PokemonStoreCtx);
+
+  useEffect(() => {
+    if (pokeState.pokeId) {
+      setPokeData(pokemonData[pokeState.pokeId]);
+    }
+  }, [pokeState]);
+
+  useEffect(() => {
+    pokeDispatch({ type: 'CLOSE_CREATE_MODAL' });
+  }, []);
 
   useEffect(() => {
     if (filterData) {
@@ -35,6 +56,16 @@ export default function Home() {
     }
   }, [pokemonData, searchData]);
 
+  useEffect(() => {
+    const newPokemonArr = [];
+    if (pokeState.pokeData) {
+      newPokemonArr.push(pokeState.pokeData);
+      setDecks((prevDecks) => [...prevDecks, ...newPokemonArr]);
+      pokeDispatch({ type: 'RESET_ADD_POKEMON' });
+      pokeDispatch({ type: 'OPEN_NOTIFY_MODAL' });
+    }
+  }, [pokeState.pokeData]);
+
   return (
     <div>
       <Search className={'px-4 py-5'} setSearchData={setSearchData} />
@@ -57,6 +88,27 @@ export default function Home() {
         )}
         {pokemonData && !loading && <PokemonLists setFilterData={setFilterData} filterData={filterData} pokeData={filteredData ? filteredData : pokemonData} className={'px-4'} />}
       </section>
+
+      {pokeState.isCreate && (
+        <section className="fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center">
+          <div onClick={() => pokeDispatch({ type: 'CLOSE_CREATE_MODAL' })} className="fixed top-0 left-0 right-0 bottom-0 bg-black/30 flex justify-center items-center -z-10"></div>
+          <div className="w-10/12 md:w-1/2">{pokeData && <PokemonCard className={'mx-auto'} pokeData={pokeData} disableOnClick={true} />}</div>
+        </section>
+      )}
+
+      {pokeState.isNotify && (
+        <section className="fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center">
+          <div onClick={() => pokeDispatch({ type: 'CLOSE_NOTIFY_MODAL' })} className="fixed top-0 left-0 right-0 bottom-0 bg-black/30 flex justify-center items-center -z-10"></div>
+          <div className="w-10/12 md:w-1/4 bg-white rounded-md">
+            <div className="w-fit mx-auto">
+              <MdCheck className="text-7xl text-green-600 my-3" />
+            </div>
+            <div className="text-center">
+              <p className="font-semibold my-5">Pokemon Added to Poke Deck</p>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

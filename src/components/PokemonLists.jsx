@@ -13,7 +13,7 @@ export default function PokemonLists(props) {
         <div className="px-4 text-end">
           <h4>Total Pokemon : {props.pokeData.length}</h4>
         </div>
-        <div className="p-4 grid md:grid-cols-2 lg:grid-cols-3 gap-5">{props.pokeData && props.pokeData.map((pokemon, index) => <PokemonCard key={index} pokeData={pokemon} />)}</div>
+        <div className="p-4 grid md:grid-cols-2 lg:grid-cols-3 gap-5">{props.pokeData && props.pokeData.map((pokemon, index) => <PokemonCard onDecksPage={props.onDecksPage} key={index} pokeData={pokemon} />)}</div>
       </div>
     </div>
   );
