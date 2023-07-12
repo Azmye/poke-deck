@@ -12,8 +12,8 @@ export default function Home() {
   const [searchData, setSearchData] = useState('');
   const [filterData, setFilterData] = useState('');
   const [pokeData, setPokeData] = useState(null);
-  const [filteredData, setFilteredData] = useState(null);
   const { pokemonData, loading, error } = useFetchAllPokemon();
+  const [filteredData, setFilteredData] = useState(pokemonData);
 
   // Context
   const [pokeState, pokeDispatch] = useContext(PokeCreateModalCtx);
@@ -46,7 +46,7 @@ export default function Home() {
   useEffect(() => {
     if (searchData) {
       const newPoke = pokemonData.filter((poke) => {
-        return poke.name === searchData;
+        return poke.name.toLowerCase().indexOf(searchData.toLowerCase()) !== -1;
       });
       setFilteredData(newPoke);
     }

@@ -30,7 +30,7 @@ export default function Decks() {
   useEffect(() => {
     if (searchData) {
       const newPoke = decks.filter((poke) => {
-        return poke.name === searchData;
+        return poke.name.toLowerCase().indexOf(searchData.toLowerCase()) !== -1;
       });
       setFilteredData(newPoke);
     }
